@@ -12,4 +12,10 @@ public static class Line
         var d2 = (p - p2).LengthSquared;
         return Math.Abs(d - d1 - d2) < delta;
     }
+
+    public static bool Intersect(Point p1, Point p2, Point q1, Point q1, out Point p)
+    {
+        // Find poi between two lines
+        
+    }
 }
