@@ -17,6 +17,8 @@ public record ParametricFunc(Function X, Function Y)
     public required double MaxT     { get => _maxT;  set => _maxT = value; }
     public required ushort Steps    { get => _steps; set => _steps = value; }
     public          bool   IsClosed { get;           set; }
+    internal SortedSet<Point> X_SortedPoints { get; } = new(Comparer<Point>.Create((p1, p2) => p1.X.CompareTo(p2.X)));
+    internal SortedSet<Point> Y_SortedPoints { get; } = new(Comparer<Point>.Create((p1, p2) => p1.Y.CompareTo(p2.Y)));
 
     internal double[] ValuesT => Enumerable.Range(0, Steps + 1)
         .Select(i => MinT + i * (MaxT - MinT) / Steps)
@@ -29,10 +31,12 @@ public record ParametricFunc(Function X, Function Y)
 
     internal (Point p1, Point p2)[] Segments => Points.Zip(Points.Skip(1), (p1, p2) => (p1, p2)).ToArray();
 
-    public bool HitTest(Point p, double delta) => Segments.Any(s => Line.HitTest(s.p1, s.p2, p, delta)) 
-                                                  || Points.Any(p1 => Math.Abs(p1.X - p.X) < delta && Math.Abs(p1.Y - p.Y) < delta);
+    public bool HitTest(Point p, double delta)
+        => Segments.Any(s => SimpleGeometry.HitTest(s.p1, s.p2, p, delta))
+                             || Points.Any(p1 => Math.Abs(p1.X - p.X) < delta && Math.Abs(p1.Y - p.Y) < delta);
 
-    public Point[] Intersect(ParametricFunc other, double delta)
+
+    public List<Point> Intersect(ParametricFunc other, double delta)
     {
         var result = new List<Point>();
 
@@ -45,9 +49,15 @@ public record ParametricFunc(Function X, Function Y)
             var segment = segments[i];
             var otherSegment = otherSegments[j];
 
-            if (Line.Intersect(segment.p1, segment.p2, otherSegment.p1, otherSegment.p2, out var p)) {
-                result.Add(p);
+            if (SimpleGeometry.LineIntersects(segment.p1, segment.p2, otherSegment.p1, otherSegment.p2)) {
+                // result.Add(p);
+
+                // 
             }
+
+            // 
         }
+
+        return result;
     }
 }
