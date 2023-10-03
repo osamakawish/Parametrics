@@ -4,7 +4,8 @@ using System.Collections.Generic;
 namespace Parametrics;
 
 public class PointCollection : IEnumerable<Point> {
-    private readonly SortedSet<Point> _points = new();
+    private IComparer<Point> Comparer { get; }
+    private readonly List<Point> Points { get; } = new();
 
     public PointCollection(IComparer<Point> comparer) { _points = new SortedSet<Point>(comparer); }
 

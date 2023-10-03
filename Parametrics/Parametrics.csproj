@@ -6,4 +6,12 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="_PointCollection.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="_PointCollection.cs" />
+  </ItemGroup>
+
 </Project>

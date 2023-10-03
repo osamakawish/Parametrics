@@ -17,8 +17,8 @@ public record ParametricFunc(Function X, Function Y)
     public required double MaxT     { get => _maxT;  set => _maxT = value; }
     public required ushort Steps    { get => _steps; set => _steps = value; }
     public          bool   IsClosed { get;           set; }
-    internal SortedSet<Point> X_SortedPoints { get; } = new(Comparer<Point>.Create((p1, p2) => p1.X.CompareTo(p2.X)));
-    internal SortedSet<Point> Y_SortedPoints { get; } = new(Comparer<Point>.Create((p1, p2) => p1.Y.CompareTo(p2.Y)));
+    internal SortedSet<Point> SortedPointsX { get; } = new(Comparer<Point>.Create((p1, p2) => p1.X.CompareTo(p2.X)));
+    internal SortedSet<Point> SortedPointsY { get; } = new(Comparer<Point>.Create((p1, p2) => p1.Y.CompareTo(p2.Y)));
 
     internal double[] ValuesT => Enumerable.Range(0, Steps + 1)
         .Select(i => MinT + i * (MaxT - MinT) / Steps)
