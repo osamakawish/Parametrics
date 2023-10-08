@@ -12,6 +12,8 @@ public record Point2D(double X, double Y)
     public static Comparison<Point2D> XComparison { get; } = (p, q) => p.X.CompareTo(q.X);
     public static Comparison<Point2D> YComparison { get; } = (p, q) => p.Y.CompareTo(q.Y);
 
+    public static Point2D operator -(Point2D p) => new(-p.X, -p.Y);
+
     public static Point2D operator +(Point2D p, Point2D q) => new(p.X + q.X, p.Y + q.Y);
 
     public static Point2D operator -(Point2D p, Point2D q) => new(p.X - q.X, p.Y - q.Y);
@@ -23,6 +25,10 @@ public record Point2D(double X, double Y)
     public static Point2D operator *(Point2D p, Point2D q) => new(p.X * q.X, p.Y * q.Y);
 
     public static Point2D operator /(Point2D p, double s) => new(p.X / s, p.Y / s);
+
+    public static Point2D operator /(double s, Point2D p) => new(s / p.X, s / p.Y);
+
+    public static Point2D operator /(Point2D p, Point2D q) => new(p.X / q.X, p.Y / q.Y);
 
     public double Dot(Point2D other) => X * other.X + Y * other.Y;
 
@@ -53,4 +59,10 @@ public record Point2D(double X, double Y)
     public static explicit operator Vector(Point2D p) => new(p.X, p.Y);
 
     public static implicit operator Point(Point2D p) => new(p.X, p.Y);
+
+    public static implicit operator Point2D(Point p) => new(p.X, p.Y);
+
+    public static implicit operator (double X, double Y)(Point2D p) => (p.X, p.Y);
+
+    public static implicit operator Point2D((double X, double Y) p) => new(p.X, p.Y);
 }
