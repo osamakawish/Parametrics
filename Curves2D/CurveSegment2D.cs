@@ -11,6 +11,7 @@ namespace Curves2D;
 // reference nodes which are intended to be clickable.
 public class CurveSegment2D : IReadOnlyList<Point>, ICollection<Point>
 {
+    public Rect Boundary { get; private set; } = Rect.Empty;
     public Point this[int index] => _points[index];
 
     public int Count => ((IReadOnlyCollection<Point>)_points).Count;
@@ -30,11 +31,37 @@ public class CurveSegment2D : IReadOnlyList<Point>, ICollection<Point>
     private int FindX(Point point) => Compare(point, _pointsSortedByX, (p, q) => p.X.CompareTo(q.X));
     private int FindY(Point point) => Compare(point, _pointsSortedByY, (p, q) => p.Y.CompareTo(q.Y));
 
-    public void Add(Point item)
+    private void UpdateBoundaryOnAddPoint(Point point)
     {
-        _pointsSortedByX.Insert(FindX(item), item);
-        _pointsSortedByY.Insert(FindY(item), item);
-        _points.Add(item);
+        if (Boundary.IsEmpty)
+            Boundary = new Rect(point, new Size(0, 0));
+        else if (point.X < Boundary.Left || point.Y < Boundary.Top)
+            Boundary = new Rect(point, new Point(Boundary.Right, Boundary.Bottom));
+        else if (point.X > Boundary.Right || point.Y > Boundary.Bottom)
+            Boundary = new Rect(new Point(Boundary.Left, Boundary.Top), point);
+    }
+
+    public void Add(Point point)
+    {
+        UpdateBoundaryAndSortPoint(point);
+        _points.Add(point);
+    }
+
+    public void Append(Point point) => Add(point);
+
+    public void Prepend(Point point) => Insert(0, point);
+
+    public void Insert(int index, Point point)
+    {
+        UpdateBoundaryAndSortPoint(point);
+        _points.Insert(index, point);
+    }
+
+    private void UpdateBoundaryAndSortPoint(Point point)
+    {
+        _pointsSortedByX.Insert(FindX(point), point);
+        _pointsSortedByY.Insert(FindY(point), point);
+        UpdateBoundaryOnAddPoint(point);
     }
 
     public void Clear() => _points.Clear();
@@ -52,8 +79,33 @@ public class CurveSegment2D : IReadOnlyList<Point>, ICollection<Point>
 
         _pointsSortedByX.RemoveAt(FindX(item));
         _pointsSortedByY.RemoveAt(FindY(item));
+        UpdateBoundaryOnRemovePoint();
+
         return removed;
     }
 
+    private void UpdateBoundaryOnRemovePoint()
+    {
+        if (_points.Count == 0) { Boundary = Rect.Empty; return; }
+        
+        double left = _pointsSortedByX[0].X;
+        double right = _pointsSortedByX[^1].X;
+        double top = _pointsSortedByY[0].Y;
+        double bottom = _pointsSortedByY[^1].Y;
+        Boundary = new Rect(new Point(left, top), new Point(right, bottom));
+    }
+
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_points).GetEnumerator();
+
+    public static CurveSegment2D operator +(CurveSegment2D segment, Point point)
+    {
+        segment.Add(point);
+        return segment;
+    }
+
+    public Rect IntersectingBoundary(Rect rect)
+        => Boundary.IntersectsWith(rect) ? Rect.Intersect(rect, Boundary) : Rect.Empty;
+
+    public Rect IntersectingBoundary(CurveSegment2D curveSegment)
+        => IntersectingBoundary(curveSegment.Boundary);
 }
