@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace Parametrics;
 
-public class ParametricCollection : IEnumerable<ParametricFunc>
+public class ParametricCollection : IEnumerable<ParametricSegment>
 {
-    List<ParametricFunc> _funcs = new();
+    List<ParametricSegment> _funcs = new();
 
-    public void Add(ParametricFunc func)
+    public void Add(ParametricSegment func)
     {
         _funcs.Add(func);
     }
 
-    public IEnumerator<ParametricFunc> GetEnumerator()
+    public IEnumerator<ParametricSegment> GetEnumerator()
     {
         return _funcs.GetEnumerator();
     }

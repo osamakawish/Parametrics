@@ -8,7 +8,7 @@ namespace Parametrics;
 
 public delegate double Function(double t);
 
-public record ParametricFunc(Function X, Function Y)
+public record ParametricSegment(Function X, Function Y)
 {
     private double _minT;
     private double _maxT;
@@ -17,8 +17,8 @@ public record ParametricFunc(Function X, Function Y)
     public required double MaxT     { get => _maxT;  set => _maxT = value; }
     public required ushort Steps    { get => _steps; set => _steps = value; }
     public          bool   IsClosed { get;           set; }
-    internal SortedSet<Point> SortedPointsX { get; } = new(Comparer<Point>.Create((p1, p2) => p1.X.CompareTo(p2.X)));
-    internal SortedSet<Point> SortedPointsY { get; } = new(Comparer<Point>.Create((p1, p2) => p1.Y.CompareTo(p2.Y)));
+    internal PointCollection SortedPointsX { get; } = PointCollection.FromComparer<PointComparerX>();
+    internal PointCollection SortedPointsY { get; } = PointCollection.FromComparer<PointComparerY>();
 
     internal double[] ValuesT => Enumerable.Range(0, Steps + 1)
         .Select(i => MinT + i * (MaxT - MinT) / Steps)
@@ -36,7 +36,7 @@ public record ParametricFunc(Function X, Function Y)
                              || Points.Any(p1 => Math.Abs(p1.X - p.X) < delta && Math.Abs(p1.Y - p.Y) < delta);
 
 
-    public List<Point> Intersect(ParametricFunc other, double delta)
+    public List<Point> Intersect(ParametricSegment other, double delta)
     {
         var result = new List<Point>();
 

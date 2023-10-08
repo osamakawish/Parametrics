@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parametrics", "Parametrics\Parametrics.csproj", "{C35B1BC4-405D-49CD-B252-5CE6E27AB13C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parametrics", "Parametrics\Parametrics.csproj", "{C35B1BC4-405D-49CD-B252-5CE6E27AB13C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Curves2D", "Curves2D\Curves2D.csproj", "{34E67827-5944-4411-87B9-52729A963AAA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{C35B1BC4-405D-49CD-B252-5CE6E27AB13C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C35B1BC4-405D-49CD-B252-5CE6E27AB13C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C35B1BC4-405D-49CD-B252-5CE6E27AB13C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34E67827-5944-4411-87B9-52729A963AAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34E67827-5944-4411-87B9-52729A963AAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34E67827-5944-4411-87B9-52729A963AAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34E67827-5944-4411-87B9-52729A963AAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
