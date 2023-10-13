@@ -1,4 +1,4 @@
-﻿global using ReadOnlyListsOfPoints = System.Collections.Generic.IReadOnlyList<System.Collections.Generic.IReadOnlyList<System.Windows.Point>>;
+﻿global using ReadOnlyListsOfPoints = System.Collections.Generic.IReadOnlyList<Curves2D.Increasing2dSegmentByX>;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,11 +9,15 @@ namespace Curves2D;
 
 delegate bool IntComparer(int a, int b);
 
-public record MonotonePartition(ReadOnlyListsOfPoints Points) : IEnumerable<IReadOnlyList<Point>>
+/// <summary>
+/// A partitioning of the points into monotone segments.
+/// </summary>
+/// <param name="Points"></param>
+public record MonotonePartition(ReadOnlyListsOfPoints Points) : IEnumerable<Increasing2dSegmentByX>
 {
     public static MonotonePartition GeneratePartition(List<Point> Points, Comparison<Point> Comparison)
     {
-        var list = new List<List<Point>>();
+        var list = new List<Increasing2dSegmentByX>();
 
         var currentList = new List<Point>();
 
@@ -24,25 +28,28 @@ public record MonotonePartition(ReadOnlyListsOfPoints Points) : IEnumerable<IRea
 
         foreach (var point in Points)
         {
-            if (currentList.Count <= 1 || currentComparer(point, currentList[^1]) < 0)
+            if (currentList.Count <= 1 || currentComparer(point, currentList[^1]) > 0)
             {
                 if (currentList.Count == 1)
-                    currentComparer = Comparison(currentList[0], point) < 0 ? forward : reverse;
+                    currentComparer = Comparison(currentList[0], point) > 0 ? forward : reverse;
 
                 currentList.Add(point);
                 continue;
             }
 
-            if (currentComparer == reverse) currentList.Reverse();
+            bool isForward = currentComparer == forward;
+            if (!isForward) currentList.Reverse();
 
-            list.Add(currentList);
+            var segment = new Increasing2dSegmentByX(points: currentList, isForward: isForward);
+
+            list.Add(segment);
             currentList.Clear();
         }
 
         return new(list);
     }
 
-    public IEnumerator<IReadOnlyList<Point>> GetEnumerator() => Points.GetEnumerator();
+    public IEnumerator<Increasing2dSegmentByX> GetEnumerator() => Points.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Points).GetEnumerator();
 }
