@@ -56,7 +56,7 @@ public record Point2D(double X, double Y)
 
     public static explicit operator Size(Point2D p) => new(p.X, p.Y);
 
-    public static explicit operator Vector(Point2D p) => new(p.X, p.Y);
+    public static implicit operator Vector(Point2D p) => new(p.X, p.Y);
 
     public static implicit operator Point(Point2D p) => new(p.X, p.Y);
 
