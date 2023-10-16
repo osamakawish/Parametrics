@@ -7,7 +7,7 @@ public delegate Point2D Function2D(double t);
 
 public record Point2D(double X, double Y)
 {
-    public static Point2D Zero { get; } = new(0, 0);
+    public static readonly Point2D Zero = new(0, 0);
 
     public static Comparison<Point2D> XComparison { get; } = (p, q) => p.X.CompareTo(q.X);
     public static Comparison<Point2D> YComparison { get; } = (p, q) => p.Y.CompareTo(q.Y);
@@ -47,6 +47,8 @@ public record Point2D(double X, double Y)
     public Point2D Rotated(double angle) => new(X * Math.Cos(angle) - Y * Math.Sin(angle), X * Math.Sin(angle) + Y * Math.Cos(angle));
 
     public Point2D Rotated(Point2D pivot, double angle) => (this - pivot).Rotated(angle) + pivot;
+
+    public Point2D Reflected() => new(-X, -Y);
 
     public Point2D Reflected(Point2D pivot) => 2 * pivot - this;
 

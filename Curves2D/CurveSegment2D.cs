@@ -195,9 +195,54 @@ public class CurveSegment2D : IReadOnlyList<Point>, ICollection<Point>
         return points.Where(p => p.ContainsWithinTolerance(finalTolerance)).Select(p => p.Point).ToList();
     }
 
-    // Alternative partitioning:
-    // - boolean: startsForward - this is the direction of the first segment.
-    // - List<int> indices - this is the list of indices that partition the curve.
+    public IReadOnlyList<int> MonotonePartitionRelativeToX(out bool startsByIncreasing)
+    {
+        var indices = new List<int>();
+        startsByIncreasing = false;
+
+        if (Count == 0) return indices;
+
+        var diff = this[1] - this[0];
+        startsByIncreasing = diff.Y > 0;
+
+        var isIncreasing = startsByIncreasing;
+
+        for (int i = 1; i < Count - 1; i++)
+        {
+            diff = this[i + 1] - this[i];
+            
+            if (diff.Y > 0 == isIncreasing) continue;
+
+            indices.Add(i);
+            isIncreasing = !isIncreasing;
+        }
+
+        return indices;
+    }
+
+    public IReadOnlyList<int> MonotonePartitionRelativeToY(out bool startsByIncreasing)
+    {
+        var indices = new List<int>();
+        startsByIncreasing = false;
+        
+        if (Count == 0) return indices;
+        
+        var diff = this[1] - this[0];
+        startsByIncreasing = diff.X > 0;
+        
+        var isIncreasing = startsByIncreasing;
+        
+        for (int i = 1; i < Count - 1; i++)
+        {
+            diff = this[i + 1] - this[i];
+            
+            if (diff.X > 0 == isIncreasing) continue;
+
+            indices.Add(i);
+            isIncreasing = !isIncreasing;
+        }
+        return indices;
+    }
 }
 
 public static class CurveExt
