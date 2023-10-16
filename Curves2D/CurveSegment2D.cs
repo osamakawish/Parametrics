@@ -194,6 +194,10 @@ public class CurveSegment2D : IReadOnlyList<Point>, ICollection<Point>
 
         return points.Where(p => p.ContainsWithinTolerance(finalTolerance)).Select(p => p.Point).ToList();
     }
+
+    // Alternative partitioning:
+    // - boolean: startsForward - this is the direction of the first segment.
+    // - List<int> indices - this is the list of indices that partition the curve.
 }
 
 public static class CurveExt

@@ -1,4 +1,4 @@
-﻿global using ReadOnlyListsOfPoints = System.Collections.Generic.IReadOnlyList<Curves2D.Increasing2dSegmentByX>;
+﻿global using ReadOnlyListsOfPoints = System.Collections.Generic.IReadOnlyList<Curves2D.Increasing2dSegment>;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,11 +13,12 @@ delegate bool IntComparer(int a, int b);
 /// A partitioning of the points into monotone segments.
 /// </summary>
 /// <param name="Points"></param>
-public record MonotonePartition(ReadOnlyListsOfPoints Points) : IEnumerable<Increasing2dSegmentByX>
+public record MonotonePartition(ReadOnlyListsOfPoints Points) : IEnumerable<Increasing2dSegment>
 {
+    // Generate based on indices of points in original curve later. For now, this will do.
     public static MonotonePartition GeneratePartition(List<Point> Points, Comparison<Point> Comparison)
     {
-        var list = new List<Increasing2dSegmentByX>();
+        var list = new List<Increasing2dSegment>();
 
         var currentList = new List<Point>();
 
@@ -40,7 +41,7 @@ public record MonotonePartition(ReadOnlyListsOfPoints Points) : IEnumerable<Incr
             bool isForward = currentComparer == forward;
             if (!isForward) currentList.Reverse();
 
-            var segment = new Increasing2dSegmentByX(points: currentList, isForward: isForward);
+            var segment = new Increasing2dSegment(points: currentList, isForward: isForward);
 
             list.Add(segment);
             currentList.Clear();
@@ -49,7 +50,11 @@ public record MonotonePartition(ReadOnlyListsOfPoints Points) : IEnumerable<Incr
         return new(list);
     }
 
-    public IEnumerator<Increasing2dSegmentByX> GetEnumerator() => Points.GetEnumerator();
+    public IEnumerator<Increasing2dSegment> GetEnumerator() => Points.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Points).GetEnumerator();
+
+    // Alternative partitioning:
+    // - boolean: startsForward - this is the direction of the first segment.
+    // - List<int> indices - this is the list of indices that partition the curve.
 }
