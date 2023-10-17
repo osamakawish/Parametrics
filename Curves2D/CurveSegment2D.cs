@@ -116,7 +116,7 @@ public class CurveSegment2D : IReadOnlyList<Point>, ICollection<Point>
     public Rect IntersectingBoundary(CurveSegment2D curveSegment)
         => IntersectingBoundary(curveSegment.Boundary);
 
-    public List<Point> PointsInBounds(Rect bounds)
+    public IReadOnlyList<Point> PointsInBounds(Rect bounds)
     {
         List<Point> points = new();
         if (!Boundary.IntersectsWith(bounds)) return points;
@@ -128,8 +128,22 @@ public class CurveSegment2D : IReadOnlyList<Point>, ICollection<Point>
         return points;
     }
 
-    public List<Point> PointsInBounds(CurveSegment2D curveSegment)
+    public IReadOnlyList<Point> PointsInBounds(Rect bounds, Range indexRange)
+    {
+        var points = new List<Point>();
+
+        foreach (var point in _points.GetRange(indexRange.Start.Value, indexRange.End.Value))
+            if (bounds.Contains(point))
+                points.Add(point);
+
+        return points;
+    }
+
+    public IReadOnlyList<Point> PointsInBounds(CurveSegment2D curveSegment)
         => PointsInBounds(curveSegment.Boundary);
+
+    public IReadOnlyList<Point> PointsInBounds(CurveSegment2D curveSegment, Range indexRange)
+        => PointsInBounds(curveSegment.Boundary, indexRange);
 
     public List<Point> PointsInBoundsSortedByX(Rect bounds)
     {
@@ -165,41 +179,72 @@ public class CurveSegment2D : IReadOnlyList<Point>, ICollection<Point>
     // Then set original points to a list of map of points to potential points of intersection.
     // TODO: Missed points of intersection when the curve segments when sub-segments intersect but points aren't
     // within the tolerance of each other.
-    public List<Point> GetPointsofIntersection(CurveSegment2D segment, double testTolerance, double finalTolerance = 1e-6)
+    public List<Point> GetPointsofIntersection(CurveSegment2D segment, double finalTolerance = 1e-6)
     {
         List<PotentialPointOfIntersection> points = new();
-        
+
         var pointsInThisSegment = PointsInBoundsSortedByX(segment);
         var pointsInOtherSegment = segment.PointsInBoundsSortedByX(this);
 
-        int i = 0, j = 0;
-        var pointInThisSegment = pointsInThisSegment[i];
+        var thisPartitionedByX = MonotonePartitionRelativeToX(out bool thisStartsByIncreasing);
+        var otherPartitionedByX = segment.MonotonePartitionRelativeToX(out bool otherStartsByIncreasing);
+
+        // Get intersections of monotone partitions.
+        var potentialIntersections = GetPotentioalIntersections(thisPartitionedByX, otherPartitionedByX);
+
+
+
+
         
+        
+        // Check pairwise for points and check if they intersect as line segments.
+        // Increment the index of the point that is less than the other.
+        // Would be smarter to do this with monotone partitioning somehow.
+        int i = 0, j = 0;
         while (i < pointsInThisSegment.Count && j < pointsInOtherSegment.Count)
         {
+            var pointInThisSegment = pointsInThisSegment[i];
             var pointInOtherSegment = pointsInOtherSegment[j];
-            var currentPoiMap = new PotentialPointOfIntersection(pointInThisSegment, new HashSet<Point>());
 
-            if (pointInThisSegment.IsEqualTo(pointInOtherSegment, testTolerance))
-            {
-                currentPoiMap.PotentialPoints.Add(pointInOtherSegment);
-            }
-            else
-            {
-                points.Add(currentPoiMap);
-                pointInThisSegment = pointsInThisSegment[++i];
-            }
-            j++;
+            // TODO
         }
 
         return points.Where(p => p.ContainsWithinTolerance(finalTolerance)).Select(p => p.Point).ToList();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="thisPartitionedByX"></param>
+    /// <param name="otherPartitionedByX"></param>
+    /// <returns>A list of pairs of indices to index the range of points of both curves where the intersection may be.</returns>
+    private List<(Range ThisIndices, Range OtherIndices)> GetPotentioalIntersections(
+        IReadOnlyList<int> thisPartitionedByX,
+        IReadOnlyList<int> otherPartitionedByX)
+    {
+        throw new NotImplementedException();
+    }
+
+    private List<Point> GetIntersectionsOfMonotoneCurves(Range thisRange, Range otherRange)
+    {
+        var thisMonotoneBoundary = MonotoneBoundary(thisRange);
+        var otherMonotoneBoundary = MonotoneBoundary(otherRange);
+        if (!thisMonotoneBoundary.IntersectsWith(otherMonotoneBoundary)) return new List<Point>();
+
+        // TODO: Get intersections of monotone curves.
+        
+
+        throw new NotImplementedException();
+    }
+
+    private Rect MonotoneBoundary(Range indexRange)
+        => new Rect(this[indexRange.Start], this[indexRange.End]);
+    
+
     public IReadOnlyList<int> MonotonePartitionRelativeToX(out bool startsByIncreasing)
     {
         var indices = new List<int>();
         startsByIncreasing = false;
-
         if (Count == 0) return indices;
 
         var diff = this[1] - this[0];

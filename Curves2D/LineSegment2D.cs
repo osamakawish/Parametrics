@@ -26,4 +26,8 @@ public record LineSegment2D(Point Start, Point End)
            point.Y <= Math.Max(Start.Y, End.Y) && point.Y >= Math.Min(Start.Y, End.Y);
 
     public static explicit operator Vector(LineSegment2D lineSegment) => lineSegment.End - lineSegment.Start;
+
+    public static implicit operator LineSegment2D((Point start, Point end) tuple) => new(tuple.start, tuple.end);
+
+    public static implicit operator (Point start, Point end)(LineSegment2D lineSegment) => (lineSegment.Start, lineSegment.End);
 }
