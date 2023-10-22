@@ -14,6 +14,7 @@ public class CurveSegment2D : IReadOnlyList<Point>, ICollection<Point>
 {
     public Rect Boundary { get; private set; } = Rect.Empty;
     public Point this[int index] => _points[index];
+    public List<Point> this[Range range] => _points.GetRange(range.Start.Value, range.GetOffsetAndLength(Count).Offset);
 
     public int Count => ((IReadOnlyCollection<Point>)_points).Count;
 
@@ -232,7 +233,7 @@ public class CurveSegment2D : IReadOnlyList<Point>, ICollection<Point>
         if (!thisMonotoneBoundary.IntersectsWith(otherMonotoneBoundary)) return new List<Point>();
 
         // TODO: Get intersections of monotone curves.
-        
+        //this[thisRange]
 
         throw new NotImplementedException();
     }
